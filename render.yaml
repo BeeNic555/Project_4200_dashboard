@@ -2,7 +2,9 @@ services:
   - type: web
     name: project_4200_dashboard
     env: python
+    rootDirectory: project_django/project_4200
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn project_4200.wsgi:application"
     preDeployCommand: "python manage.py migrate && python manage.py collectstatic --noinput"
+
 
