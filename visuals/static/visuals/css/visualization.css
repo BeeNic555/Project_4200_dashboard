@@ -1,0 +1,87 @@
+/* visualization setting*/
+
+/* visualization title page setting*/
+.visual-card {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  animation: fadeIn 1.2s ease;
+}
+
+.visual-card h2 {
+  font-size: 40px;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.gradient-bar {
+  height: 4px;
+  width: 60px;
+  margin: 14px auto 24px;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  border-radius: 2px;
+}
+
+.visual-header-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.plot-card{
+  background: white;
+  padding: 80px 40px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  max-width: 1000px;
+  width: 100%;
+}
+
+.plot-card h2{
+  font-size: 30px;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.note {
+  background: #eef5ff;
+  border-left: 5px solid #3399ff;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 14px;
+}
+
+.explanation {
+  background-color: #f8faff;
+  border-left: 5px solid #007acc;
+  padding: 16px 20px;
+  margin: 10px 0 40px;
+  font-size: 20px;
+  line-height: 1.8;
+  color: #333;
+  box-shadow: 0 0 4px rgba(0,0,0,0.05);
+}
+
+.explanation ul {
+  margin: 10px 0 10px 20px;
+}
+
+
+/* specific setting for treemap page*/
+.treemap-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}

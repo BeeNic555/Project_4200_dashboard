@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Visual analysis of VR games</title>
+
+  <!-- D3 + Sankey function -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+  <!-- Vega + Altair function -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <!-- add css file -->
+  <link rel="stylesheet" href="{% static 'visuals/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'visuals/css/visualization.css' %}">
+</head>
+
+<body>
+
+  <!-- title page -->
+  <section class="cover-page">
+    <div class="cover-card">
+      <h1 class="cover-title">The Impact of Different Factors on the Popularity of VR Games</h1>
+      <p class="cover-subtitle">Fenghao Cui, Mengyang Wang, Jialin Weng, Shaoxian Wang</p>
+    </div>
+  </section>
+
+  <!-- introduction of project page -->
+  <section class="page-section">
+    <div class="content-card">
+      <h2>📌 Introduction of the Project</h2>
+      <p class="placeholder">
+        Virtual reality (VR) gaming is a rapidly developing field that facilitates immersive and engaging experiences
+        that change the way users interact with the digital world. It is worth noting that the popularity of VR games
+        differs, and multiple factors define this difference, including hardware availability, game development, social
+        interaction, and technological progress. The knowledge of these facets is important for developers, marketers,
+        and researchers who want to improve user experience and contribute to VR games adoption. The website investigates
+        such determinants of VR games’ popularity as price, average review(number of reviews), operating system, and
+        release year. The examination of the mentioned factors helps predict the future of VR gaming and its role in
+        the popular entertainment area.
+      </p>
+    </div>
+  </section>
+
+  <!-- introduction of raw data page-->
+  <section class="page-section">
+    <div class="content-card">
+      <h2>📂 Introduction of Original Data</h2>
+      <div class="placeholder">
+        <p>
+        The dataset used in this study is derived from a web crawl of the virtual reality (VR) game rankings on the
+        Steam platform. We collected data from the top 2,100 VR games on the platform at a specific point in time, and
+        constructed a game dataset containing rich information, which provides basic support for subsequent analysis.
+        </p>
+        <p>
+          The dataset contains a total of 12 key attributes, covering the basic information and user feedback of each
+          game, <strong>mainly including</strong>:
+          <ul>
+            <li>Game name</li>
+            <li>Game ID</li>
+            <li>Release price</li>
+            <li>Release time</li>
+            <li>Operating System</li>
+            <li>Game Genres</li>
+            <li>Number of Reviews</li>
+            <li>Review Rating</li>
+            <li>Year of release</li>
+            <li>Supported VR</li>
+            <li>Supported VR</li>
+          </ul>
+        </p>
+
+        <p >
+          This dataset allows us to explore the potential factors affecting the popularity of VR games from multiple
+          dimensions, such as the distribution of game genres, the effectiveness of pricing strategies, the impact
+          of release time, and the number and tendency of user reviews. By comprehensively analyzing the above
+          variables, we hope to reveal the patterns and driving mechanisms behind popularity in the VR game market,
+          and provide valuable references for developers and researchers.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- visualization page -->
+  <section class="page-section">
+    <div class="visual-card">
+      <h2 class="visual-header-title">📊 Visualization</h2>
+      <div class="gradient-bar"></div>
+      <p>This section presents several visualizations to help analyze the factors that
+        influence the popularity of VR games.</p>
+    </div>
+  </section>
+
+  <!-- Bar plot page -->
+  <section class="page-section">
+  <div class="plot-card">
+    <h2>🎯 Genre Count by Game Range</h2>
+    <div class="note">Look at the number of times different genres appear in different ranges of games。</div>
+
+    <div style="margin: 20px 0;">
+      <label for="topNSlider-bar">
+        Top N Games: <span id="topNValue-bar">10</span>
+      </label>
+      <input type="range" id="topNSlider-bar" min="10" max="2000" step="50" value="10"/>
+    </div>
+
+    <div id="altair-bar-chart"></div>
+
+    <div class="explanation">
+      <p><strong>Chart interpretation:</strong></p>
+        <p>
+          This bar chart illustrates the distribution of main genres among the most reviewed games, allowing users to
+          interactively explore how game genres vary across pricing ranges by adjusting the number of top-reviewed
+          games with a slider. Each colored bar represents a unique main genre, and the height of each bar reflects
+          how frequently that genre appears in the current top selection.
+        </p>
+
+        <p>
+          From this chart, we can observe that <strong>Action games dominate the current top selection</strong>, followed
+          by <strong>Adventure</strong>, while <strong>Indie</strong> and <strong>Massively Multiplayer</strong> genres are less common. This may suggest genre preferences
+          among the most reviewed games or reflect the market focus of certain pricing tiers.
+        </p>
+
+        <p>
+          The x-axis categorizes games by their main genre, while the y-axis shows the number of games falling into each
+          category. Each bar is color-coded to help differentiate genres at a glance. This visualization helps identify
+          genre dominance, variation, and potential patterns in genre popularity within a certain range of top games.
+        </p>
+
+        <p>
+          From this graph, you can observe:
+          <ul>
+            <li>Which genres appear most frequently among the top-reviewed games?</li>
+            <li>Do different groups prefer different genres?</li>
+            <li>Are certain genres (e.g. Simulation, Casual) concentrated in low-ranking groups?</li>
+          </ul>
+        This chart supports trend discovery around genre popularity and provides insights into user engagement patterns
+        across different game types.
+        </p>
+
+        <p><strong>Interactive tips:</strong>
+          Use the <strong>Top N Games slider</strong> to dynamically adjust the number of games being analyzed. The chart will update
+          accordingly to reflect genre changes, helping users explore how genre distribution evolves across different
+          levels of popularity.
+        </p>
+    </div>
+  </div>
+</section>
+
+  <!-- tree map page -->
+  <section class="page-section">
+  <div class="plot-card">
+    <h2>📊 VR Game Genre Distribution</h2>
+    <div class="note">
+      This treemap shows the distribution of the first genre for each VR game in the dataset.
+      Each rectangle represents a genre, and its size corresponds to the number of games that list it as the first genre.
+    </div>
+    <div class="slider-control" style="margin-bottom: 20px;">
+      <label for="topNSlider-treemap">
+        <strong>Top N Games:</strong>
+        <span id="treemap-slider-value">500</span>
+      </label>
+      <input type="range" id="topNSlider-treemap" min="100" max="2000" step="100" value="500">
+    </div>
+    <div id="treemap-container"></div>
+    <!-- tooltip -->
+    <div class="treemap-tooltip" style="position: absolute; opacity: 0; pointer-events: none;"></div>
+    <div class="explanation">
+      <p><strong>Chart Interpretation:</strong></p>
+      <p>
+        This TreeMap provides a clear visual representation of how genres are distributed across VR games.
+        We extract the <strong>first genre</strong> listed for each game as its primary genre.
+        The size of each block in the chart reflects how frequently that genre appears in the dataset.
+      </p>
+
+      <p>
+          From this graph, you can observe:
+          <ul>
+            <li>Larger blocks represent genres that appear more frequently as the first listed genre.</li>
+            <li>Are there certain types of games (Action, Casual) that are more likely to gain acceptance?</li>
+          This view helps us understand which types of VR games are most common and popular in terms of classification.
+          </ul>
+        </p>
+
+        <p><strong>Interactive tips:</strong>
+          Hovering over each block will display the genre name and the number of games.
+        </p>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Sankey page -->
+  <section class="page-section">
+    <div class="plot-card">
+      <h2>Sankey：Genre → Review Summary</h2>
+      <div class="note">Show the distribution of each type in different ratings.</div>
+      <div id="sankey"></div>
+      <div class="explanation">
+        <p><strong>Chart interpretation:</strong></p>
+        <p>
+          This Sankey chart shows the relationship between different VR game genres and their Review Summary.
+          Each line indicates the number of games in a particular game genre that have been marked with a specific rating.
+          <strong>The thicker the line, the more times the game has appeared in that rating.</strong>
+        </p>
+
+        <p>
+          Ratings are derived from the Review Summary on Steam, such as:
+          <em>Overwhelmingly Positive</em>
+          <em>Very Positive</em>
+          <em>Mixed</em>.
+          The tags in the figure have been sorted from good to bad reviews for horizontal comparison.
+        </p>
+
+        <p>
+          From this graph, you can observe:
+          <ul>
+            <li>Which game genres receive higher reviews on Steam?</li>
+            <li>Are there certain types of games (Action, Casual) that are more likely to gain acceptance?</li>
+            <li>Are certain types of games often rated "Mixed" or lower?</li>
+          </ul>
+        This can help us understand different types of market performance from a content preference,
+        quality control or audience perspective.
+        </p>
+
+        <p><strong>Interactive tips:</strong>
+          Hover over any link or node in the graph to see the specific quantitative
+          relationship between the corresponding type and the rating.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- lineplot page -->
+  <section class="page-section">
+  <div class="plot-card">
+    <h2>📈 VR Game Reviews by Month</h2>
+    <div class="note">
+      You can select one or more years to see the monthly review trends for VR games released that year.
+      The line represents the total number of reviews for each month.
+    </div>
+    <label for="yearSelectLine"><strong>Select Year(s):</strong></label>
+    <div id="yearSelectLine" style="margin: 10px 0;"></div>
+    <div id="linechart-container" style="margin-top: 20px;"></div>
+    <div class="explanation">
+      <p><strong>Chart Interpretation:</strong></p>
+      <p>
+        This line chart illustrates the relationship between the release month of VR games and the total number of
+        reviews they received on Steam. Each line represents a specific year, and each point on the line indicates
+        the number of reviews for games released in a particular month of that year. The higher the point on the
+        line, the more reviews games released in that month have received. The review data is aggregated by year
+        and month based on the release date of each game and is plotted with smooth curves for clearer trend
+        analysis.
+      </p>
+
+      <p>
+          From this graph, you can observe:
+          <ul>
+            <li>Which months consistently see more reviews across multiple years?</li>
+            <li>Do seasonal patterns emerge in VR game popularity or review activity?</li>
+            <li>Are there year-over-year changes in activity levels, possibly due to industry
+              shifts or global trends?</li>
+          </ul>
+        This visualization helps identify release windows that tend to attract more engagement,
+        offering insights into game release timing strategies, player activity cycles, and overall
+        seasonal market behavior.
+        </p>
+
+        <p><strong>Interactive tips:</strong>
+          <ul>
+            <li>Select one or more years using the checkboxes to compare review trends over time.</li>
+            <li>Hover over the line to see the exact number of reviews for a given month and year.</li>
+          </ul>
+        </p>
+    </div>
+  </div>
+</section>
+
+  <!-- Scatter plot page -->
+  <section class="page-section">
+  <div class="plot-card">
+    <h2>🎯 Scatter Plot: Price vs. Number of Reviews</h2>
+    <div class="note">Observe the relationship between price and number of reviews, and categorize them by rating level.</div>
+
+    <!-- Slider control -->
+    <label for="scatterSlider">Top N Games: <span id="scatterTopN">500</span></label>
+    <input type="range" id="scatterSlider" min="100" max="2000" step="100" value="500" style="margin-bottom: 20px;">
+
+    <!-- Drop-down menu control -->
+    <label for="genreSelect" style="margin-left: 20px;">
+      Filter Genre:
+    </label>
+    <select id="genreSelect">
+      <option value="All">All</option>
+      <option value="Action">Action</option>
+      <option value="Adventure">Adventure</option>
+      <option value="Casual">Casual</option>
+      <option value="Indie">Indie</option>
+      <option value="Simulation">Simulation</option>
+      <option value="Sports">Sports</option>
+      <option value="Strategy">Strategy</option>
+      <option value="Violent">Violent</option>
+    </select>
+
+    <div id="altair-scatter"></div>
+
+    <div class="explanation">
+      <p><strong>Chart interpretation:</strong></p>
+        <p>
+          This scatter plot visualizes the relationship between VR game prices and their popularity—measured by the
+          number of user reviews—allowing users to explore market dynamics through zooming, genre selection, and a
+          Top N filter. Each point represents a VR game, and its color indicates its primary genre, based on the
+          first-listed genre for each title.
+        </p>
+
+        <p>
+          Users can now interactively:
+          <ul>
+            <li>Zoom in or out using the mouse to focus on specific regions of the chart—such as low-priced games or
+              highly reviewed ones.</li>
+            <li>Filter by genre using the dropdown menu to highlight specific categories like "Action", "Indie",
+              or "Simulation".</li>
+            <li>Apply a "Top N" filter to display only the most popular games (i.e., those with the highest review counts).</li>
+          </ul>
+        </p>
+
+        <p>
+          From this graph, you can observe:
+          <ul>
+            <li>Popular games cluster at lower prices: Many of the most-reviewed VR games are priced below $30,
+              indicating strong engagement in more affordable titles.</li>
+            <li>Genre trends vary: Widespread genres like "Indie" and "Action" span a range of prices and review levels,
+              while niche genres such as "RPG" or "Massively Multiplayer" are typically less reviewed and often higher
+              priced.</li>
+            <li>Outliers stand out: A few games with extremely high review counts or premium prices are easily identified,
+              representing best-sellers or high-end experiences.</li>
+          </ul>
+        This chart helps uncover how pricing and genre affect visibility or popularity in the VR gaming market, and can
+        guide both consumers and developers in understanding market trends.
+        </p>
+
+      <p><strong>Interactive tips:</strong>
+        <ul>
+            <li>Use your mouse to zoom and pan to examine specific areas—e.g., mid-tier pricing, high-engagement games.</li>
+            <li>Select a genre from the dropdown to analyze how that category behaves in terms of pricing and popularity.</li>
+            <li>Adjust the Top N filter to limit the view to the most popular games—this is useful for spotting
+              best-sellers or comparing leading titles across genres.</li>
+            <li>Hover over individual points to see game-level details such as title, price, number of reviews, and genre.</li>
+          </ul>
+      </p>
+    </div>
+  </div>
+</section>
+
+  <!-- Histogram page -->
+  <section class="page-section">
+  <div class="plot-card">
+    <h2>📊 Histogram: VR Game Price Distribution</h2>
+    <div class="note">Show changes in price trends and accumulations over the scope of the game.</div>
+    <div style="margin: 20px 0;">
+      <label for="topNSlider">
+        Top N Games: <span id="topNValue">500</span>
+      </label>
+      <input type="range" id="topNSlider" min="100" max="2000" step="100" value="500" />
+    </div>
+    <div id="altair-histogram"></div>
+    <div class="explanation">
+      <p><strong>Chart interpretation:</strong></p>
+        <p>
+          This histogram shows the price distribution of the most reviewed VR games, allowing users to interactively
+          explore pricing trends by changing the number of top-reviewed games between 100 and 2000. We used a kernel
+          density estimate (KDE) to overlay a smoothed red trend line, which helps visualize the overall distribution
+          of game prices. <strong>VR games priced under $30 tend to attract significantly more reviews, while those with higher
+          price see a noticeable drop in engagement.</strong>
+        </p>
+
+        <p>
+          The blue bars show how many games fall within each price range, where deeper shades represent lower-priced
+          games regardless of frequency, lighter shades represent higher prices, and a green diamond marks the most
+          common price point with the highest number of reviews.
+        </p>
+
+        <p>
+          From this graph, you can observe:
+          <ul>
+            <li>What price range contains the highest number of most-reviewed VR games?</li>
+            <li>How does the distribution of game prices change as we increase the number of top-reviewed games
+              included in the analysis?</li>
+            <li>Do lower-priced VR games consistently attract more user engagement compared to higher-priced ones?</li>
+          </ul>
+        This chart helps find how pricing may influence game popularity, and reveals common price tiers in the VR gaming market.
+        </p>
+
+        <p><strong>Interactive tips:</strong>
+          Use the Top N Games slider to change the number of reviewed games shown,
+          and hover over the bars to see how the game counts as the red curve and green peak update.
+        </p>
+    </div>
+  </div>
+</section>
+
+  <!-- Summary page -->
+  <section class="page-section">
+    <div class="content-card">
+      <h2>📝 Summary</h2>
+      <p class="placeholder">（此处将总结图表中发现的趋势、结论和启发）</p>
+    </div>
+  </section>
+
+  <!-- Future page -->
+  <section class="page-section">
+    <div class="content-card">
+      <h2>🚀 Do in the Future</h2>
+      <p class="placeholder">（此处将列出后续可以继续探索或改进的方向）</p>
+    </div>
+  </section>
+
+  <!-- References page -->
+  <section class="page-section">
+    <div class="content-card">
+      <h2>📖 References</h2>
+      <ul class="reference-list">
+        <li>
+          <a href = 'https://www.roadtovr.com/quest-2-unit-sales-estimate-psvr-unit-sales/'>[1]</a>
+          B. Lang, “Quest 2 May Be Selling Thrice as Fast as the Best Selling VR Headset, PSVR,” Road to VR,
+          Apr. 01, 2021.
+        </li>
+
+        <li>
+          <a href = 'https://doi.org/10.3390/electronics13193913'>[2]</a>
+          D.-M. Yoon, S.-H. Han, I. Park, and T.-S. Chung, “Analyzing VR Game User Experience by Genre: A
+          Text-Mining Approach on Meta Quest Store Reviews,” Electronics, vol. 13, no. 19, pp. 3913–3913, Oct. 2024.
+        </li>
+
+        <li>
+          <a href = 'https://doi.org/10.1016/j.chb.2022.107242'>[3]</a>
+          F. Reer, Lars-Ole Wehden, R. Janzik, W. Y. Tang, and T. Quandt, “Virtual reality technology and game
+          enjoyment: The contributions of natural mapping and need satisfaction,” Computers in Human Behavior,
+          vol. 132, pp. 107242–107242, Feb. 2022.
+        </li>
+
+        <li>
+          <a href = 'https://doi.org/10.1109/aikiie60097.2023.10390456'>[4]</a>
+          S. Agarwal, J. Yang, M. Seyedebrahimi, and G. Alan Rhodes, “Factors Affecting the Popularity of VR-Related
+          Educational Videos on TikTok,” 2023 International Conference on Ambient Intelligence, Knowledge Informatics
+          and Industrial Electronics (AIKIIE), pp. 1–6, Nov. 2023.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Reference js files -->
+  <script src="{% static 'visuals/js/sankey.js' %}"></script>
+  <script src="{% static 'visuals/js/lineplot.js' %}"></script>
+  <script src="{% static 'visuals/js/histogram.js' %}"></script>
+  <script src="{% static 'visuals/js/scatter.js' %}"></script>
+  <script src="{% static 'visuals/js/bar.js' %}"></script>
+  <script src="{% static 'visuals/js/treemap.js' %}"></script>
+
+
+
+  <!-- Animation effect -->
+  <script>
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.page-section').forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+
+</body>
+</html>
