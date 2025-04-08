@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+
+# Django
+*.db
+*.sqlite3
+/staticfiles/
+/media/
+/.env
+
+# macOS
+.DS_Store
+
+# VSCode/PyCharm
+.vscode/
+.idea/
+
+# Node (如果你用到)
+node_modules/
