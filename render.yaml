@@ -3,6 +3,6 @@ services:
     name: project_4200_dashboard
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn project_4200.wsgi"
+    startCommand: "gunicorn project_4200.wsgi:application"
     preDeployCommand: "python manage.py migrate && python manage.py collectstatic --noinput"
-#
+
