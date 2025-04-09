@@ -311,12 +311,15 @@
     <div class="explanation">
       <p><strong>Chart interpretation:</strong></p>
         <p>
-          This scatter plot visualizes the relationship between VR game prices and their popularity—measured by the
-          number of user reviews—allowing users to explore market dynamics through zooming, genre selection, and a
-          Top N filter. Each point represents a VR game, and its color indicates its primary genre, based on the
-          first-listed genre for each title. <strong>This chart helps uncover how pricing and genre affect visibility
-          or popularity in the VR gaming market, and can guide both consumers and developers in understanding market
-          trends.</strong>
+          This scatter plot visualizes the relationship between VR game prices(below $200) and their popularity—measured
+          by the number of user reviews—allowing users to explore market dynamics through zooming, genre selection,
+          and a Top N filter. Each point represents a VR game, and its color indicates its review summary to see whether
+          the reviews are mixed, mostly positive, overwhelmingly positive or very positive.
+        </p>
+
+        <p>
+          <strong>This chart helps uncover how pricing and genre affect visibility or popularity in the VR gaming market,
+            and can guide both consumers and developers in understanding market trends.</strong>
         </p>
 
         <p>
@@ -326,20 +329,21 @@
               highly reviewed ones.</li>
             <li>Filter by genre using the dropdown menu to highlight specific categories like "Action", "Indie",
               or "Simulation".</li>
-            <li>Apply a "Top N" filter to display only the most popular games (i.e., those with the highest review counts).</li>
+            <li>Apply a "Top N" filter to display only the most popular games (i.e., those with the highest review
+              counts).</li>
           </ul>
         </p>
 
         <p>
           From this graph, you can observe:
           <ul>
-            <li>Popular games cluster at lower prices: Many of the most-reviewed VR games are priced below $30,
-              indicating strong engagement in more affordable titles.</li>
+            <li>Popular games cluster at lower prices: Many of the most-reviewed VR games are priced below $30, and
+              most of the reviews of them are very positive, indicating strong engagement in more affordable titles.</li>
             <li>Genre trends vary: Widespread genres like "Indie" and "Action" span a range of prices and review levels,
               while niche genres such as "RPG" or "Massively Multiplayer" are typically less reviewed and often higher
               priced.</li>
-            <li>Outliers stand out: A few games with extremely high review counts or premium prices are easily identified,
-              representing best-sellers or high-end experiences.</li>
+            <li>There are no games between the price of $100 to $200 which might suggest that consumers are not willing
+              to buy the games with price above $100.</li>
           </ul>
         This chart helps uncover how pricing and genre affect visibility or popularity in the VR gaming market, and can
         guide both consumers and developers in understanding market trends.
@@ -351,7 +355,8 @@
             <li>Select a genre from the dropdown to analyze how that category behaves in terms of pricing and popularity.</li>
             <li>Adjust the Top N filter to limit the view to the most popular games—this is useful for spotting
               best-sellers or comparing leading titles across genres.</li>
-            <li>Hover over individual points to see game-level details such as title, price, number of reviews, and genre.</li>
+            <li>Hover over individual points to see game-level details such as name, price, number of reviews,
+              review summary and its primary genre.</li>
           </ul>
       </p>
     </div>
