@@ -115,8 +115,8 @@ def line_data(request):
     df['Month'] = df['Release_Date'].dt.month
 
     # 获取每月评论最多的游戏
-    top_game = df.loc[df.groupby(['Year', 'Month'])['Number_of_Reviews'].idxmax(), ['Year', 'Month', 'Name']]
-    top_game = top_game.rename(columns={'Name': 'Top_Game'})
+    top_game = df.sort_values('Number_of_Reviews', ascending=False).groupby(['Year', 'Month']).first().reset_index()
+    top_game = top_game[['Year', 'Month', 'Name']].rename(columns={'Name': 'Top_Game'})
 
     # 获取每月总评论数
     reviews_sum = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
@@ -125,7 +125,6 @@ def line_data(request):
     merged = pd.merge(reviews_sum, top_game, on=['Year', 'Month'], how='left')
 
     return JsonResponse(merged.to_dict(orient='records'), safe=False)
-
 
 def altair_histogram(request):
     # get TopN parameters to facilitate js rendering dynamic changes of web pages
@@ -250,12 +249,12 @@ def altair_scatter(request):
 
     # Density line (along Price axis), grouped by Review_Summary
     density = alt.Chart(df_filtered).transform_density(
-        density='Price',
+        density='Number_of_Reviews',
         groupby=['Review_Summary'],
-        as_=['Price', 'Density']
+        as_=['Number_of_Reviews', 'Density']
     ).mark_line(size=2).encode(
-        x='Price:Q',
-        y='Density:Q',
+        x=alt.X('Number_of_Reviews:Q', title='Number of Reviews'),
+        y=alt.Y('Density:Q', title='Density'),
         color=alt.Color('Review_Summary:N', legend=None)
     )
 
@@ -264,7 +263,7 @@ def altair_scatter(request):
         width=700,
         height=400,
         title=alt.TitleParams(
-            text=f'Top {top_n_value} VR Games: Price vs. Reviews (with Density by Review)',
+            text=f'Top {top_n_value} VR Games: Reviews vs. Review Count (with Density by Rating)',
             fontSize=20,
             fontWeight='bold'
         )
