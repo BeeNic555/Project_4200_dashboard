@@ -7,10 +7,15 @@ fetch('/sankey-data/')
     const height = Math.max(500, nodeCount * 12);
 
     const reviewOrder = [
-      "Overwhelmingly Positive", "Very Positive", "Positive",
-      "Mostly Positive", "Mixed", "Negative",
-      "Mostly Negative", "Overwhelmingly Negative"
+      "Overwhelmingly Negative", "Mostly Negative", "Negative",
+      "Mixed",
+      "Mostly Positive", "Positive", "Very Positive", "Overwhelmingly Positive"
     ];
+
+    // 创建渐变色比例尺
+    const colorScale = d3.scaleSequential()
+      .domain([0, reviewOrder.length - 1])
+      .interpolator(d3.interpolateGreens); // 可换成 interpolateBlues 等
 
     const svg = d3.select("#sankey").append("svg")
       .attr("width", width)
@@ -89,7 +94,10 @@ fetch('/sankey-data/')
       .attr("y", d => d.y0)
       .attr("height", d => d.y1 - d.y0)
       .attr("width", d => d.x1 - d.x0)
-      .attr("fill", "#96c0ce")
+      .attr("fill", d => {
+        const index = reviewOrder.indexOf(d.name);
+        return index !== -1 ? colorScale(index) : "#96c0ce";
+      })
       .on("mouseover", function (event, d) {
         d3.select(this).attr("fill", "#ffcc00");
         tooltip2.transition().duration(200).style("opacity", 1);
@@ -103,7 +111,10 @@ fetch('/sankey-data/')
           .style("top", (event.pageY - 28) + "px");
       })
       .on("mouseout", function () {
-        d3.select(this).attr("fill", "#96c0ce");
+        d3.select(this).attr("fill", d => {
+          const index = reviewOrder.indexOf(d.name);
+          return index !== -1 ? colorScale(index) : "#96c0ce";
+        });
         tooltip2.transition().duration(300).style("opacity", 0);
       });
 
