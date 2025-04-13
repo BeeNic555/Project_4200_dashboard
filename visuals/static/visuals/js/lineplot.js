@@ -135,7 +135,11 @@ document.addEventListener("DOMContentLoaded", function () {
         .on("mouseover", (event, d) => {
           tooltip
             .style("opacity", 1)
-            .html(`<strong>${d3.timeFormat("%B")(new Date(2025, d.Month - 1))} ${year}</strong><br>Reviews: ${d.Number_of_Reviews}`)
+            .html(`
+                <strong>${d3.timeFormat("%B")(new Date(2025, d.Month - 1))} ${year}</strong><br>
+                Reviews: ${d.Number_of_Reviews}<br>
+                Top Game: <em>${d.Top_Game || "N/A"}</em>
+                `)
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY - 28}px`);
         })

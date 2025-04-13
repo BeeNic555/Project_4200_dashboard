@@ -104,7 +104,7 @@ def line_data(request):
     csv_path = os.path.join(BASE_DIR, 'VR_Game_data_2280.csv')
     df = pd.read_csv(csv_path)
 
-    if 'Release_Date' not in df.columns or 'Number_of_Reviews' not in df.columns:
+    if 'Release_Date' not in df.columns or 'Number_of_Reviews' not in df.columns or 'Name' not in df.columns:
         return JsonResponse({'error': 'Required columns not found'}, status=400)
 
     # Date preprocessing
@@ -114,13 +114,18 @@ def line_data(request):
     df['Year'] = df['Release_Date'].dt.year
     df['Month'] = df['Release_Date'].dt.month
 
-    # Aggregate the total number of reviews per month per year
-    result = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
+    # 获取每月评论最多的游戏
+    top_game = df.loc[df.groupby(['Year', 'Month'])['Number_of_Reviews'].idxmax(), ['Year', 'Month', 'Name']]
+    top_game = top_game.rename(columns={'Name': 'Top_Game'})
 
-    # Convert to a list of dictionaries
-    data = result.to_dict(orient='records')
+    # 获取每月总评论数
+    reviews_sum = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
 
-    return JsonResponse(data, safe=False)
+    # 合并
+    merged = pd.merge(reviews_sum, top_game, on=['Year', 'Month'], how='left')
+
+    return JsonResponse(merged.to_dict(orient='records'), safe=False)
+
 
 def altair_histogram(request):
     # get TopN parameters to facilitate js rendering dynamic changes of web pages
