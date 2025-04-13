@@ -81,23 +81,23 @@ def sankey_data(request):
     node_map = {name: idx for idx, name in enumerate(all_nodes)}
     nodes = [{'name': name} for name in all_nodes]
 
-    # 按 genre → review 统计数量
     grouped = sankey_df.groupby(['source', 'target']).size().reset_index(name='value')
 
-    # 加入 percentage 字段：value / 每个 genre 的总值
+    # 计算每个 genre 的总数，用于计算比例
     grouped['genre_total'] = grouped.groupby('source')['value'].transform('sum')
-    grouped['percentage'] = grouped['value'] / grouped['genre_total']
+    grouped['percentage'] = grouped.apply(lambda row:
+                                          row['value'] / row['genre_total'] if row['genre_total'] > 0 else 0, axis=1
+                                          )
 
     # 构建 links，包含百分比字段
     links = grouped.apply(lambda row: {
         'source': node_map[row['source']],
         'target': node_map[row['target']],
         'value': row['value'],
-        'percentage': round(row['percentage'], 4)  # 保留4位小数
+        'percentage': round(row['percentage'], 4)
     }, axis=1).tolist()
 
     return JsonResponse({'nodes': nodes, 'links': links})
-
 
 
 
