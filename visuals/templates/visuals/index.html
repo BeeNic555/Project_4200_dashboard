@@ -174,48 +174,49 @@
   </div>
 </section>
 
-  <!-- tree map page -->
-  <section class="page-section">
-  <div class="plot-card">
-    <h2>📊 VR Game Genre Distribution</h2>
-    <div class="note">
-      This treemap shows the distribution of the first genre for each VR game in the dataset.
-      Each rectangle represents a genre, and its size corresponds to the number of games that list it as the first genre.
+  <!-- top game searcher page -->
+<section class='page-section'>
+  <div class='plot-card'>
+    <h2>🎮 Top Rated Game by Genre</h2>
+    <div class='note'>
+      This tool allows you to select a game genre and find the top-rated VR game in that category.
+      The result is based on user review summary and number of reviews.
     </div>
-    <div class="slider-control" style="margin-bottom: 20px;">
-      <label for="topNSlider-treemap">
-        <strong>Top N Games:</strong>
-        <span id="treemap-slider-value">500</span>
+
+    <!-- genre selector -->
+    <div class='slider-control' style='margin-bottom: 20px;'>
+      <label for='genreSelectSearch'>
+        <strong>Select Genre:</strong>
       </label>
-      <input type="range" id="topNSlider-treemap" min="100" max="2000" step="100" value="500">
+      <select id='genreSelectSearch' style='margin-left: 10px;'>
+        <option value='Action'>Action</option>
+        <option value='Adventure'>Adventure</option>
+        <option value='Casual'>Casual</option>
+        <option value='Indie'>Indie</option>
+        <option value='Simulation'>Simulation</option>
+        <option value='Sports'>Sports</option>
+        <option value='Strategy'>Strategy</option>
+        <option value='Violent'>Violent</option>
+      </select>
     </div>
-    <div id="treemap-container"></div>
-    <!-- tooltip -->
-    <div class="treemap-tooltip" style="position: absolute; opacity: 0; pointer-events: none;"></div>
-    <div class="explanation">
+
+    <div id='top-game-info' style='padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9;'>
+      <em>Please select a genre to view the top game.</em>
+    </div>
+
+    <div class='explanation'>
       <p><strong>Chart Interpretation:</strong></p>
       <p>
-        This TreeMap provides a clear visual representation of how genres are distributed across VR games.
-        We extract the <strong>first genre</strong> listed for each game as its primary genre.
-        The size of each block in the chart reflects how frequently that genre appears in the dataset.
+        This search feature identifies the highest-rated game for a selected genre, helping you discover standout VR titles.
       </p>
-
-      <p>
-          From this graph, you can observe:
       <ul>
-        <li>Larger blocks represent genres that appear more frequently as the first listed genre.</li>
-        <li>Are there certain types of games (Action, Casual) that are more likely to gain acceptance?</li>
-        This view helps us understand which types of VR games are most common and popular in terms of classification.
+        <li>The result is ranked first by review quality (e.g., “Overwhelmingly Positive”) and second by the number of reviews.</li>
+        <li>This helps you find popular and well-received games within a specific genre.</li>
+        <li>If no data is available for the selected genre, the tool will return “N/A”.</li>
       </ul>
-      </p>
-
-      <p><strong>Interactive tips:</strong>
-        Hovering over each block will display the genre name and the number of games.
-      </p>
     </div>
   </div>
 </section>
-
 
   <!-- Sankey page -->
   <section class="page-section">
@@ -296,7 +297,7 @@
         <p><strong>Interactive tips:</strong>
           <ul>
             <li>Select one or more years using the checkboxes to compare review trends over time.</li>
-            <li>Hover over the line to see the exact number of reviews for a given month and year.</li>
+            <li>Hover over the line to see the exact number of reviews and top game name for a given month and year.</li>
           </ul>
         </p>
     </div>
@@ -506,7 +507,7 @@
   <script src="{% static 'visuals/js/histogram.js' %}"></script>
   <script src="{% static 'visuals/js/scatter.js' %}"></script>
   <script src="{% static 'visuals/js/bar.js' %}"></script>
-  <script src="{% static 'visuals/js/treemap.js' %}"></script>
+  <script src="{% static 'visuals/js/search_game.js' %}"></script>
 
 
 

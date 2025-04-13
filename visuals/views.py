@@ -13,42 +13,42 @@ from scipy.stats import rankdata
 def dashboard(request):
     return render(request, 'visuals/index.html')
 
-def treemap_data(request):
-
-    top_n_value = int(request.GET.get("top_n", 500))
+def search_top_game_by_genre(request):
+    genre = request.GET.get("genre")
 
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     csv_path = os.path.join(BASE_DIR, 'VR_Game_data_2280.csv')
     df = pd.read_csv(csv_path)
 
-    df = df[['Name', 'Genres', 'Number_of_Reviews']].dropna()
-    df['Number_of_Reviews'] = df['Number_of_Reviews'].astype(int)
+    df = df[df['Genres'].notna() & df['Review_Summary'].notna()]
+    df['Primary Genre'] = df['Genres'].str.split(',').str[0].str.strip()
 
-    # Extract the main Genre (first)
-    df['Primary_Genre'] = df['Genres'].str.split(',').str[0].str.strip()
+    # Define the grading order
+    score_order = [
+        "Overwhelmingly Positive", "Very Positive", "Positive",
+        "Mostly Positive", "Mixed", "Negative", "Mostly Negative", "Overwhelmingly Negative"
+    ]
+    score_map = {name: i for i, name in enumerate(reversed(score_order))}
+    df['Score_Index'] = df['Review_Summary'].map(score_map)
 
-    # Sort and select the TopN
-    df['Rank'] = rankdata(-df['Number_of_Reviews'], method='ordinal')
-    top_df = df[df['Rank'] <= top_n_value]
+    # Sort by rating and number of comments
+    filtered = df[df['Primary Genre'] == genre].sort_values(
+        by=['Score_Index', 'Number_of_Reviews'], ascending=[False, False]
+    )
 
-    # Count the number of occurrences of the first genre
-    genre_counts = top_df['Primary_Genre'].value_counts().reset_index()
-    genre_counts.columns = ['Genre', 'Count']
+    if not filtered.empty:
+        top_game = filtered.iloc[0]
+        result = {
+            "Name": top_game['Name'],
+            "Price": top_game.get('Price', 'N/A'),
+            "Review_Summary": top_game['Review_Summary'],
+            "Number_of_Reviews": top_game['Number_of_Reviews'],
+            "Release_Date": top_game.get('Release_Date', '')
+        }
+    else:
+        result = {"Name": "N/A"}
 
-    # plot treemap
-    children = []
-    for _, row in genre_counts.iterrows():
-        children.append({
-            'name': row['Genre'],
-            'value': row['Count']
-        })
-
-    treemap_structure = {
-        'name': f'Top {top_n_value} Genres',
-        'children': children
-    }
-
-    return JsonResponse(treemap_structure)
+    return JsonResponse(result)
 
 def sankey_data(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -107,25 +107,23 @@ def line_data(request):
     if 'Release_Date' not in df.columns or 'Number_of_Reviews' not in df.columns or 'Name' not in df.columns:
         return JsonResponse({'error': 'Required columns not found'}, status=400)
 
-    # 预处理
     df['Release_Date'] = pd.to_datetime(df['Release_Date'], errors='coerce')
     df = df.dropna(subset=['Release_Date', 'Number_of_Reviews'])
 
     df['Year'] = df['Release_Date'].dt.year
     df['Month'] = df['Release_Date'].dt.month
 
-    # 找出每月评论最多的游戏
+    # Find out which games are reviewed the most each month
     top_game = df.sort_values('Number_of_Reviews', ascending=False).groupby(['Year', 'Month']).first().reset_index()
     top_game = top_game[['Year', 'Month', 'Name']].rename(columns={'Name': 'Top_Game'})
 
-    # 每月总评论数
+    # Total reviews per month
     reviews_sum = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
 
-    # 合并
+    # merge
     merged = pd.merge(reviews_sum, top_game, on=['Year', 'Month'], how='left')
 
     return JsonResponse(merged.to_dict(orient='records'), safe=False)
-
 
 def altair_histogram(request):
     # get TopN parameters to facilitate js rendering dynamic changes of web pages

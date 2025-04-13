@@ -16,12 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from visuals.views import dashboard, treemap_data, sankey_data, line_data, altair_histogram, altair_scatter, altair_bar_chart
+from visuals.views import dashboard, search_top_game_by_genre, sankey_data, line_data, altair_histogram, altair_scatter, altair_bar_chart
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', dashboard, name='dashboard'),  # Home Access dashboard (All data)
-    path('treemap-data/', treemap_data, name='treemap_data'),
+    path("top-game-search/", search_top_game_by_genre, name = 'search_top_game_by_genre'),
     path('sankey-data/', sankey_data, name='sankey_data'),
     path('line-data/', line_data, name = 'line_data'),
     path('histogram/', altair_histogram, name='altair_histogram'),

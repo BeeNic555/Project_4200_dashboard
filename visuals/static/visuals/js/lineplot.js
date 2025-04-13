@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const years = [...new Set(validData.map(d => d.Year))].sort();
       const checkboxContainer = document.getElementById("yearSelectLine");
 
-      // Populate the checkbox button group
       checkboxContainer.innerHTML = "";
       years.forEach(year => {
         const label = document.createElement("label");
@@ -34,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.value = year;
-        // The last year is selected by default
         checkbox.checked = year === years[years.length - 1];
         checkbox.style.marginRight = "4px";
 
@@ -50,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
         checkboxContainer.appendChild(label);
       });
 
-      // Default painting last year
       drawChart([years[years.length - 1]]);
     });
 
@@ -93,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     svg.append("g").call(d3.axisLeft(y));
 
-    // X-axis label
     svg.append("text")
       .attr("x", width / 2)
       .attr("y", height + margin.bottom - 5)
@@ -101,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .attr("font-size", "13px")
       .text("Month");
 
-    // Y-axis label
     svg.append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", -margin.left + 15)
@@ -111,11 +106,18 @@ document.addEventListener("DOMContentLoaded", function () {
       .text("Number of Reviews");
 
     grouped.forEach(([year, data]) => {
-      const monthMap = Object.fromEntries(data.map(d => [d.Month, d.Number_of_Reviews]));
-      const filled = allMonths.map(m => ({
-        Month: m,
-        Number_of_Reviews: monthMap[m] || 0
-      }));
+      const monthMap = Object.fromEntries(
+        data.map(d => [d.Month, d]) // 保留 Top_Game 字段
+      );
+
+      const filled = allMonths.map(m => {
+        const record = monthMap[m];
+        return {
+          Month: m,
+          Number_of_Reviews: record ? record.Number_of_Reviews : 0,
+          Top_Game: record ? record.Top_Game : "N/A"
+        };
+      });
 
       svg.append("path")
         .datum(filled)
@@ -136,9 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
           tooltip
             .style("opacity", 1)
             .html(`
-                <strong>${d3.timeFormat("%B")(new Date(2025, d.Month - 1))} ${year}</strong><br>
-                Reviews: ${d.Number_of_Reviews}<br>
-                Top Game: <em>${d.Top_Game || d.top_game || "N/A"}</em>`)
+              <strong>${d3.timeFormat("%B")(new Date(2025, d.Month - 1))} ${year}</strong><br>
+              Reviews: ${d.Number_of_Reviews}<br>
+              Top Game: <em>${d.Number_of_Reviews > 0 ? d.Top_Game : "N/A"}</em>`)
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY - 28}px`);
         })
