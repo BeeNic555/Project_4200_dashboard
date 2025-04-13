@@ -9,7 +9,6 @@ from scipy.signal import find_peaks
 from scipy.stats import rankdata
 # views.py
 
-# visuals/views.py
 
 def dashboard(request):
     return render(request, 'visuals/index.html')
@@ -52,11 +51,11 @@ def treemap_data(request):
     return JsonResponse(treemap_structure)
 
 def sankey_data(request):
-
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     csv_path = os.path.join(BASE_DIR, 'VR_Game_data_2280.csv')
     df = pd.read_csv(csv_path)
 
+    # 只保留有用字段，去掉缺失值
     df = df[['Genres', 'Review_Summary']].dropna()
 
     valid_reviews = [
@@ -66,6 +65,7 @@ def sankey_data(request):
     ]
     df = df[df['Review_Summary'].isin(valid_reviews)]
 
+    # 拆分第一主 genre 并创建 source-target 对
     rows = []
     for _, row in df.iterrows():
         genre = row['Genres'].split(',')[0].strip()
@@ -74,24 +74,32 @@ def sankey_data(request):
 
     sankey_df = pd.DataFrame(rows)
 
-    # sort genre list
+    # 构建 nodes
     genres = sorted(sankey_df['source'].unique())
-    # sort the ratings from best to worst
     reviews = [r for r in valid_reviews if r in sankey_df['target'].unique()]
-
     all_nodes = genres + reviews
     node_map = {name: idx for idx, name in enumerate(all_nodes)}
-
     nodes = [{'name': name} for name in all_nodes]
 
-    links = sankey_df.groupby(['source', 'target']).size().reset_index(name='value')
-    links = links.apply(lambda row: {
+    # 按 genre → review 统计数量
+    grouped = sankey_df.groupby(['source', 'target']).size().reset_index(name='value')
+
+    # 加入 percentage 字段：value / 每个 genre 的总值
+    grouped['genre_total'] = grouped.groupby('source')['value'].transform('sum')
+    grouped['percentage'] = grouped['value'] / grouped['genre_total']
+
+    # 构建 links，包含百分比字段
+    links = grouped.apply(lambda row: {
         'source': node_map[row['source']],
         'target': node_map[row['target']],
-        'value': row['value']
+        'value': row['value'],
+        'percentage': round(row['percentage'], 4)  # 保留4位小数
     }, axis=1).tolist()
 
     return JsonResponse({'nodes': nodes, 'links': links})
+
+
+
 
 def line_data(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

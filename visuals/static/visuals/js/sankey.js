@@ -61,8 +61,9 @@ fetch('/sankey-data/')
         d3.select(this).attr("stroke", "#f66").attr("stroke-opacity", 0.8);
         tooltip2.transition().duration(200).style("opacity", 1);
         tooltip2.html(
-          `<strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br>
-           Count: <strong>${d.value}</strong>`
+            `<strong>${d.source.name}</strong> → <strong>${d.target.name}</strong><br>
+            Count: <strong>${d.value}</strong><br>
+            Share in Genre: <strong>${(d.percentage * 100).toFixed(1)}%</strong>`
         )
         .style("left", (event.pageX + 10) + "px")
         .style("top", (event.pageY - 28) + "px");
