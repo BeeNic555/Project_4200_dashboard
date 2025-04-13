@@ -55,7 +55,7 @@ def sankey_data(request):
     csv_path = os.path.join(BASE_DIR, 'VR_Game_data_2280.csv')
     df = pd.read_csv(csv_path)
 
-    # 只保留有用字段，去掉缺失值
+    # Keep only useful fields and remove missing values
     df = df[['Genres', 'Review_Summary']].dropna()
 
     valid_reviews = [
@@ -65,7 +65,7 @@ def sankey_data(request):
     ]
     df = df[df['Review_Summary'].isin(valid_reviews)]
 
-    # 拆分第一主 genre 并创建 source-target 对
+    # Split the first main genre and create a source-target pair
     rows = []
     for _, row in df.iterrows():
         genre = row['Genres'].split(',')[0].strip()
@@ -74,7 +74,7 @@ def sankey_data(request):
 
     sankey_df = pd.DataFrame(rows)
 
-    # 构建 nodes
+    # nodes
     genres = sorted(sankey_df['source'].unique())
     reviews = [r for r in valid_reviews if r in sankey_df['target'].unique()]
     all_nodes = genres + reviews
@@ -83,13 +83,13 @@ def sankey_data(request):
 
     grouped = sankey_df.groupby(['source', 'target']).size().reset_index(name='value')
 
-    # 计算每个 genre 的总数，用于计算比例
+    # Calculate the total number of each genre to calculate the scale
     grouped['genre_total'] = grouped.groupby('source')['value'].transform('sum')
     grouped['percentage'] = grouped.apply(lambda row:
                                           row['value'] / row['genre_total'] if row['genre_total'] > 0 else 0, axis=1
                                           )
 
-    # 构建 links，包含百分比字段
+    # Builds links, including the percentage field
     links = grouped.apply(lambda row: {
         'source': node_map[row['source']],
         'target': node_map[row['target']],
@@ -98,8 +98,6 @@ def sankey_data(request):
     }, axis=1).tolist()
 
     return JsonResponse({'nodes': nodes, 'links': links})
-
-
 
 def line_data(request):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -236,23 +234,38 @@ def altair_scatter(request):
     if genre_filter != "All":
         df_filtered = df_filtered[df_filtered['Primary Genre'] == genre_filter]
 
-    # plot scatter
+    # Scatter plot
     scatter = alt.Chart(df_filtered).mark_circle(opacity=0.7).encode(
-        x=alt.X('Price:Q', title='Price (USD)', axis=alt.Axis(labelFontSize=14, labelFontStyle='italic', labelAngle=45, titleFontSize=16)),
+        x=alt.X('Price:Q', title='Price (USD)',
+                axis=alt.Axis(labelFontSize=14, labelFontStyle='italic', labelAngle=45, titleFontSize=16)),
         y=alt.Y('Number_of_Reviews:Q', title='Number of Reviews', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
         color=alt.Color('Review_Summary:N', legend=alt.Legend(title='Review Summary')),
         tooltip=['Name:N', 'Price:Q', 'Number_of_Reviews:Q', 'Review_Summary:N', 'Primary Genre:N']
-    ).interactive().properties(
+    ).interactive()
+
+    # Density line (along Price axis), grouped by Review_Summary
+    density = alt.Chart(df_filtered).transform_density(
+        density='Price',
+        groupby=['Review_Summary'],
+        as_=['Price', 'Density']
+    ).mark_line(size=2).encode(
+        x='Price:Q',
+        y='Density:Q',
+        color=alt.Color('Review_Summary:N', legend=None)
+    )
+
+    # Combine
+    chart = (scatter + density).properties(
         width=700,
         height=400,
         title=alt.TitleParams(
-            text=f'Top {top_n_value} VR Games: Price vs. Reviews',
+            text=f'Top {top_n_value} VR Games: Price vs. Reviews (with Density by Review)',
             fontSize=20,
             fontWeight='bold'
         )
     )
 
-    return JsonResponse(scatter.to_dict())
+    return JsonResponse(chart.to_dict())
 
 def altair_bar_chart(request):
 

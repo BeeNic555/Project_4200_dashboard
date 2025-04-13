@@ -12,7 +12,7 @@ fetch('/sankey-data/')
       "Mostly Positive", "Positive", "Very Positive", "Overwhelmingly Positive"
     ];
 
-    // 创建渐变色比例尺
+    // Create a gradient scale
     const colorScale = d3.scaleSequential()
       .domain([0, reviewOrder.length - 1])
       .interpolator(d3.interpolateGreens); // 可换成 interpolateBlues 等
