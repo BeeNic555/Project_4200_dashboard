@@ -104,7 +104,7 @@ def line_data(request):
     csv_path = os.path.join(BASE_DIR, 'VR_Game_data_2280.csv')
     df = pd.read_csv(csv_path)
 
-    if 'Release_Date' not in df.columns or 'Number_of_Reviews' not in df.columns or 'Name' not in df.columns:
+    if 'Release_Date' not in df.columns or 'Number_of_Reviews' not in df.columns:
         return JsonResponse({'error': 'Required columns not found'}, status=400)
 
     # Date preprocessing
@@ -114,17 +114,13 @@ def line_data(request):
     df['Year'] = df['Release_Date'].dt.year
     df['Month'] = df['Release_Date'].dt.month
 
-    # 获取每月评论最多的游戏
-    top_game = df.sort_values('Number_of_Reviews', ascending=False).groupby(['Year', 'Month']).first().reset_index()
-    top_game = top_game[['Year', 'Month', 'Name']].rename(columns={'Name': 'Top_Game'})
+    # Aggregate the total number of reviews per month per year
+    result = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
 
-    # 获取每月总评论数
-    reviews_sum = df.groupby(['Year', 'Month'])['Number_of_Reviews'].sum().reset_index()
+    # Convert to a list of dictionaries
+    data = result.to_dict(orient='records')
 
-    # 合并
-    merged = pd.merge(reviews_sum, top_game, on=['Year', 'Month'], how='left')
-
-    return JsonResponse(merged.to_dict(orient='records'), safe=False)
+    return JsonResponse(data, safe=False)
 
 def altair_histogram(request):
     # get TopN parameters to facilitate js rendering dynamic changes of web pages
@@ -238,38 +234,23 @@ def altair_scatter(request):
     if genre_filter != "All":
         df_filtered = df_filtered[df_filtered['Primary Genre'] == genre_filter]
 
-    # Scatter plot
+    # plot scatter
     scatter = alt.Chart(df_filtered).mark_circle(opacity=0.7).encode(
-        x=alt.X('Price:Q', title='Price (USD)',
-                axis=alt.Axis(labelFontSize=14, labelFontStyle='italic', labelAngle=45, titleFontSize=16)),
+        x=alt.X('Price:Q', title='Price (USD)', axis=alt.Axis(labelFontSize=14, labelFontStyle='italic', labelAngle=45, titleFontSize=16)),
         y=alt.Y('Number_of_Reviews:Q', title='Number of Reviews', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
         color=alt.Color('Review_Summary:N', legend=alt.Legend(title='Review Summary')),
         tooltip=['Name:N', 'Price:Q', 'Number_of_Reviews:Q', 'Review_Summary:N', 'Primary Genre:N']
-    ).interactive()
-
-    # Density line (along Price axis), grouped by Review_Summary
-    density = alt.Chart(df_filtered).transform_density(
-        density='Number_of_Reviews',
-        groupby=['Review_Summary'],
-        as_=['Number_of_Reviews', 'Density']
-    ).mark_line(size=2).encode(
-        x=alt.X('Number_of_Reviews:Q', title='Number of Reviews'),
-        y=alt.Y('Density:Q', title='Density'),
-        color=alt.Color('Review_Summary:N', legend=None)
-    )
-
-    # Combine
-    chart = (scatter + density).properties(
+    ).interactive().properties(
         width=700,
         height=400,
         title=alt.TitleParams(
-            text=f'Top {top_n_value} VR Games: Reviews vs. Review Count (with Density by Rating)',
+            text=f'Top {top_n_value} VR Games: Price vs. Reviews',
             fontSize=20,
             fontWeight='bold'
         )
     )
 
-    return JsonResponse(chart.to_dict())
+    return JsonResponse(scatter.to_dict())
 
 def altair_bar_chart(request):
 
